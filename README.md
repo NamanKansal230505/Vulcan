@@ -1,6 +1,5 @@
-# Vulcan
-Decrypting and reverse engineering propreitory Advanced Fire Alarm Polling Protocols.
-# Project Vulcan: Advanced Fire Alarm Polling Protocols
+# Project Vulcan: Advanced Fire Alarm Polling ProtocolsDecrypting and reverse engineering propreitory Advanced Fire Alarm Polling Protocols.
+
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: R&D](https://img.shields.io/badge/status-research_%26_development-red.svg)](https://github.com/)
