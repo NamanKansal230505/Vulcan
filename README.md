@@ -2,7 +2,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: R&D](https://img.shields.io/badge/status-research_%26_development-red.svg)](https://github.com/)
 
-Decrypting and reverse engineering propreitory Advanced Fire Alarm Polling Protocols.
+Decrypting and reverse engineering proprietary Advanced Fire Alarm Polling Protocols.
 
 An open-source initiative dedicated to researching, developing, and reverse-engineering the communication protocols of addressable fire alarm systems. This project aims to create some of the world's fastest and most robust polling algorithms for life-safety applications.
 
