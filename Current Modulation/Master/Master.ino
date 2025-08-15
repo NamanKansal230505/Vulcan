@@ -1,28 +1,100 @@
-// =========================================================
-// ==           Simple Pulse Transmitter                  ==
-// =========================================================
+// ====================================================================
+// ==        FINAL POLLING MASTER (Direct Detection Logic)           ==
+// ====================================================================
 
-// The pin connected to the Gate of your MOSFET
 const int txPin = 2;
+const int rxAnalogPin = A0;
+const unsigned long bitDelay = 100; // Tuned speed
+const int THRESHOLD = 100; // New threshold for direct 0-0.2V signal
 
 void setup() {
-  // Set the transmitter pin as an output
   pinMode(txPin, OUTPUT);
-  
-  // Start serial communication to show that it's working
+  digitalWrite(txPin, LOW);
   Serial.begin(115200);
-  Serial.println("Pulse Transmitter Initialized.");
+  Serial.println("\n[MASTER] Final Polling Master Initialized.");
+  Serial.println("---------------------------------");
+  delay(2000); // Give slave time to boot
+}
+
+// --- Helper Functions ---
+void delayMicrosExact(unsigned long duration) {
+  unsigned long start = micros();
+  while (micros() - start < duration);
+}
+
+// MODIFIED: Simplified pulse detection
+bool isPulseDetected() {
+  return analogRead(rxAnalogPin) > THRESHOLD;
+}
+
+// --- Transmission Functions ---
+void sendBit(bool bitVal) {
+  if (bitVal == 1) { // A '1' is a pulse
+    digitalWrite(txPin, HIGH);
+    delay(bitDelay);
+    digitalWrite(txPin, LOW);
+  } else { // A '0' is silence
+    delay(bitDelay);
+  }
+}
+
+void sendByte(byte data) {
+  sendBit(true); // Start Pulse
+  for (int i = 7; i >= 0; i--) {
+    sendBit((data >> i) & 1);
+  }
+}
+
+// --- Reception Function ---
+byte receiveByte(unsigned long timeout_ms) {
+  unsigned long startWait = millis();
+  while (!isPulseDetected()) {
+    if (millis() - startWait > timeout_ms) {
+      return 255; // Timeout error code
+    }
+  }
+  while (isPulseDetected());
+
+  byte data = 0;
+  delay(bitDelay / 2);
+
+  for (int i = 7; i >= 0; i--) {
+    if (isPulseDetected()) {
+      data |= (1 << i);
+    }
+    delay(bitDelay);
+  }
+  return data;
 }
 
 void loop() {
-  // Announce that we're sending a pulse
-  Serial.println("Sending pulse...");
+  for (int addrToPoll = 1; addrToPoll <= 8; addrToPoll++) {
+    Serial.print("Polling slave #");
+    Serial.print(addrToPoll);
+    Serial.print("... ");
 
-  // Create a strong, 100-millisecond pulse
-  digitalWrite(txPin, HIGH);
-  delay(100);
-  digitalWrite(txPin, LOW);
+    sendByte(addrToPoll);
 
-  // Wait for the rest of the 2-second interval
-  delay(1900);
+    byte responseByte = receiveByte(100);
+
+    if (responseByte == 255) {
+      Serial.println("No response.");
+    } else {
+      int receivedAddr = (responseByte >> 4);
+      bool sensorStatus = responseByte & 0x01;
+
+      if (receivedAddr == addrToPoll) {
+        Serial.print("Response OK from #");
+        Serial.print(receivedAddr);
+        Serial.print(" | Sensor is: ");
+        Serial.println(sensorStatus ? "OK" : "TRIGGERED");
+      } else {
+        Serial.print("Response from wrong address! Got data: ");
+        Serial.println(responseByte, BIN);
+      }
+    }
+    delay(500);
+  }
+  Serial.println("--- Polling cycle complete ---\n");
+  delay(2000);
 }
