@@ -13,7 +13,7 @@ const int ledPin = 7;
 const int myAddress = 4; // << CHANGE THIS FOR EACH SLAVE
 
 // --- Protocol Timing ---
-const unsigned long bitDelay = 100; // Must match the master
+const unsigned long bitDelay = 10; // Must match the master
 
 void setup() {
   pinMode(txPin, OUTPUT);

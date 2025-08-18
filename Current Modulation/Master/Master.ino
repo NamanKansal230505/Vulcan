@@ -4,7 +4,7 @@
 
 const int txPin = 2;
 const int rxAnalogPin = A0;
-const unsigned long bitDelay = 100; // Tuned speed
+const unsigned long bitDelay = 10; // Tuned speed
 const int THRESHOLD = 100; // New threshold for direct 0-0.2V signal
 
 void setup() {
@@ -93,7 +93,7 @@ void loop() {
         Serial.println(responseByte, BIN);
       }
     }
-    delay(500);
+    delay(5);
   }
   Serial.println("--- Polling cycle complete ---\n");
   delay(2000);
